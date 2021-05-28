@@ -1,4 +1,4 @@
-# Baby Cheetah
+# MoKraRosA
 
 wiki: https://github.com/spirka3/mokrarosa/wiki/Baby-Cheetah
 
