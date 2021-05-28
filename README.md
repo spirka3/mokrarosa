@@ -1,10 +1,7 @@
-# mokrarosa
-Modulárny Krahulský Robot s Arduinom (MoKraRosA)
+# Baby Cheetah
+https://github.com/Robotics-DAI-FMFI-UK/mokrarosa/wiki
 
-Files:
-
-* src/arduino/
-
+Files src/arduino/
 
    * 01_serial_port/  - simple output through serial port
    * 02_serport_input/  - simple input from serial port 
@@ -19,5 +16,3 @@ Files:
    * 11_mikrofon/  - control vehicle using sound 
    * 12_mp3_player/  - start playing musing with DFPlayer Mini
    * learn_sequence/learn_sequence.ino  - interactive program for learning a choreography 
-   
-*  wiki https://github.com/Robotics-DAI-FMFI-UK/mokrarosa/wiki
