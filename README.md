@@ -1,8 +1,8 @@
 # Baby Cheetah
-https://github.com/Robotics-DAI-FMFI-UK/mokrarosa/wiki
 
-Files src/arduino/
+wiki: https://github.com/spirka3/mokrarosa/wiki/Baby-Cheetah
 
+files: src/arduino/
    * 01_serial_port/  - simple output through serial port
    * 02_serport_input/  - simple input from serial port 
    * 03_zasviet_LED/  - internal LED flashing
