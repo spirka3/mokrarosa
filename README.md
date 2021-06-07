@@ -1,6 +1,6 @@
 # MoKraRosA
 
-wiki: https://github.com/spirka3/mokrarosa/wiki/Baby-Cheetah
+wiki: https://github.com/spirka3/mokrarosa/wiki
 
 files: src/arduino/
    * 01_serial_port/  - simple output through serial port
