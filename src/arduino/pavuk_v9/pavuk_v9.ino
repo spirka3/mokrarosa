@@ -1,16 +1,16 @@
 #include <EEPROM.h>
 #include <Servo.h>
 #include <Wire.h>
-#include <MPU6050.h>
+//#include <MPU6050.h>
 
 // put next line after comment, if you have no MPU6050 gyroscope
-#define HAVE_GYRO
+// #define HAVE_GYRO
 
 // for version 1 comment-out the following line
-#define GYRO_UPSIDE_DOWN
+// #define GYRO_UPSIDE_DOWN
 
 // put next line after comment, if you have no HC-SR04 ultrasonic 
-#define HAVE_ULTRASONIC
+// #define HAVE_ULTRASONIC
 
 // pin connections:
 // servos:
@@ -51,6 +51,8 @@
 #define SERIAL_BUFFER_LENGTH   20
 
 // left/right front/back 1=upper, 2=lower
+// LF1, LB1, RF1, RB1, LF2, LB2, RF2, RB2
+
 #define LF1 0
 #define LB1 1
 #define RF1 2
@@ -95,9 +97,9 @@ uint8_t initial[] = {45,135,135,45,175,5,5,175};
 
 uint8_t australian[] = {45,135,135,45,5,175,175,5};
 
-#ifdef HAVE_GYRO
-MPU6050 mpu;
-#endif
+// #ifdef HAVE_GYRO
+//MPU6050 mpu;
+// #endif
 
 int usual_delay = 70;
 int inp = 0;
@@ -163,9 +165,9 @@ void setup()
   Serial.println(F("MoKraRoSA. Press H for help"));
   init_serial(9600);
   
-#ifdef HAVE_GYRO
-  mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
-#endif
+// #ifdef HAVE_GYRO
+//  mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
+// #endif
 
   step_size = 1;
   sound_greeting();
@@ -606,9 +608,9 @@ char read_latest_char()
 void refresh_gyro()
 {
 #ifdef HAVE_GYRO
-  Vector normAccel = mpu.readNormalizeAccel();
-  pitch = -(atan2(normAccel.XAxis, sqrt(normAccel.YAxis*normAccel.YAxis + normAccel.ZAxis*normAccel.ZAxis))*180.0)/M_PI;
-  roll = (atan2(normAccel.YAxis, normAccel.ZAxis)*180.0)/M_PI;  
+//  Vector normAccel = mpu.readNormalizeAccel();
+//  pitch = -(atan2(normAccel.XAxis, sqrt(normAccel.YAxis*normAccel.YAxis + normAccel.ZAxis*normAccel.ZAxis))*180.0)/M_PI;
+//  roll = (atan2(normAccel.YAxis, normAccel.ZAxis)*180.0)/M_PI;  
 #ifdef GYRO_UPSIDE_DOWN
   roll += 180;
   if (roll > 180) roll -= 360;
@@ -1128,47 +1130,67 @@ void play_sequence(uint8_t repete)
 
 void load_sequence()
 {
+  // init
   serial_print_flash(PSTR("Paste the sequence (or type SPACE/N to cancel): "));
   char c;
   uint8_t ok;
   
+  // idk
   do {
     c = serial_peek();
   } while (c == -1);
   
+  // check if cancelled
   if ((c == ' ')  || (c == 'N'))
   {
     Serial.read();
     serial_println_flash(PSTR("cancelled."));
     return;
   }
+
+  // reset seq_length
   seq_length = 0;
   serial_println();
   serial_println_flash(PSTR("loading... (terminate with empty line)"));
 
+  // while true read and write
   do {
     while ((!Serial.available()) && !serial_available());
     c = serial_peek();
-    if ((c == 13) || (c == 10)) break;
+    if ((c == 'k') || (c == 10)) break;
     ok = 1;
-    for (int i = 0; ok & (i < 8); i++)
-      seq[seq_length][i] = read_number(&ok);
+    for (int i = 0; ok & (i < 8); i++) {
+      // CORRECT ORDER
+      int leg = i;
+      if (i == 0) leg = 0;
+      else if (i == 1) leg = 4;
+      else if (i == 2) leg = 5;
+      else if (i == 3) leg = 1;
+      else if (i == 4) leg = 2;
+      else if (i == 5) leg = 6;
+      else if (i == 6) leg = 7;
+      else if (i == 7) leg = 3;
+      if (i < 4) {
+        seq[seq_length][leg] = read_number(&ok);
+      } else {
+        seq[seq_length][leg] = 180 - read_number(&ok);
+      }
+    }
     if (!ok) break;   
+    
     delaj[seq_length] = read_number(&ok);
+    
     if (!ok) break;
+    
     serial_println();
     seq_length++;
   } while (1);
-  if (!ok) 
-  {
-    serial_println();
-    serial_println_flash(PSTR("loading failed."));
-  }
-  else 
-  {
-    Serial.read();
+
+  // check status
+  if (!ok)
+    serial_println_flash(PSTR("Failed."));
+  else
     serial_println_flash(PSTR("Done."));
-  }
 }
 
 int read_number(uint8_t *ok)
